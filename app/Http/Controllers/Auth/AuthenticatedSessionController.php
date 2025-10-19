@@ -26,6 +26,28 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
+        // --- INICIO DE LA MODIFICACIÓN ---
+        
+        // Revisamos si el usuario que acaba de iniciar sesión está activo
+        if (Auth::user()->is_active == false) {
+            
+            // Si no está activo (is_active es false):
+            // 1. Cerramos la sesión que se acababa de crear.
+            Auth::guard('web')->logout();
+
+            // 2. Invalidamos la sesión.
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            // 3. Lo devolvemos al login con un mensaje de error específico.
+            return redirect()->route('login')->withErrors([
+                'email' => 'Esta cuenta ha sido deshabilitada. Contacta al administrador.',
+            ]);
+        }
+
+        // --- FIN DE LA MODIFICACIÓN ---
+
+        // Si SÍ está activo, simplemente sigue con el proceso normal.
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));

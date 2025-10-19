@@ -12,10 +12,10 @@ class UserController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $users = User::with('role')->get();
-        return view('users.index', compact('users'));
-    }
+{
+    $users = User::with('role')->get(); // Así debe estar
+    return view('users.index', compact('users'));
+}
 
     /**
      * Show the form for creating a new resource.
@@ -72,8 +72,23 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);
-        $user->delete();
+        
+        // --- CAMBIO PRINCIPAL ---
+        $user->update(['is_active' => false]);
+        // --- FIN DEL CAMBIO ---
 
-        return redirect()->route('users.index')->with('success', 'Usuario eliminado exitosamente.');
+        // Mensaje de éxito actualizado
+        return redirect()->route('users.index')->with('success', 'Usuario deshabilitado exitosamente.');
+    }
+
+    /**
+     * Habilita un usuario que estaba deshabilitado.
+     */
+    public function enable(string $id)
+    {
+        $user = User::findOrFail($id);
+        $user->update(['is_active' => true]);
+
+        return redirect()->route('users.index')->with('success', 'Usuario habilitado exitosamente.');
     }
 }

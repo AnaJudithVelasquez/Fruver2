@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
 
     // Usuarios - SuperAdmin
     Route::resource('users', UserController::class)->middleware('role:SuperAdministrador');
+
+    Route::post('users/{user}/enable', [UserController::class, 'enable'])->name('users.enable')->middleware('role:SuperAdministrador');
 });
 
 require __DIR__.'/auth.php';
